@@ -17,6 +17,7 @@ import {
   ServerOptions,
 } from "vscode-languageclient";
 import * as os from "os";
+import { TaskProvider } from "./TaskProvider";
 
 export let defaultClient: LanguageClient;
 const clients: Map<string, LanguageClient> = new Map();
@@ -66,9 +67,9 @@ function detectConflictingExtension(extensionId: string): void {
   if (extension) {
     vscode.window.showErrorMessage(
       "Warning: " +
-        extensionId +
-        " is not compatible with ElixirLS, please uninstall " +
-        extensionId
+      extensionId +
+      " is not compatible with ElixirLS, please uninstall " +
+      extensionId
     );
   }
 }
@@ -77,16 +78,16 @@ function sortedWorkspaceFolders(): string[] {
   if (_sortedWorkspaceFolders === void 0) {
     _sortedWorkspaceFolders = workspace.workspaceFolders
       ? workspace.workspaceFolders
-          .map((folder) => {
-            let result = folder.uri.toString();
-            if (result.charAt(result.length - 1) !== "/") {
-              result = result + "/";
-            }
-            return result;
-          })
-          .sort((a, b) => {
-            return a.length - b.length;
-          })
+        .map((folder) => {
+          let result = folder.uri.toString();
+          if (result.charAt(result.length - 1) !== "/") {
+            result = result + "/";
+          }
+          return result;
+        })
+        .sort((a, b) => {
+          return a.length - b.length;
+        })
       : [];
   }
   return _sortedWorkspaceFolders;
@@ -336,6 +337,8 @@ export function activate(context: ExtensionContext): void {
       }
     }
   });
+
+  vscode.tasks.registerTaskProvider(TaskProvider.TaskType, new TaskProvider());
 }
 
 export function deactivate(): Thenable<void> {
